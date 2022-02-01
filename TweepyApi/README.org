@@ -1,0 +1,16 @@
+#+TITLE: Readme
+
+* keywords
+  - save all in database for data stream.
+    - timestamp,
+    - entries for Person who tweet/retweet it:
+      - name, screen_name, text, users, retweet_count, reply_count, quote_count, follower
+    - entries for Person whose tweet is retweeted it:
+      - name, screen_name, retweet_count, reply_count, quote_count, follower
+    - entries for Person whose was mentioned in tweet/retweet.
+
+
+* convert json into more readable structure
+#+BEGIN_SRC sh :noeval
+gron tmp.json > tmp.txt
+#+END_SRC
