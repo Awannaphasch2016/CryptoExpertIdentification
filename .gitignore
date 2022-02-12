@@ -5,5 +5,7 @@ tmp/
 
 .projectile
 *.csv
+!*.dvc
 *data/
 .dir-locals.el
+*.png

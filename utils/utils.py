@@ -2,14 +2,22 @@
 from datetime import datetime, timedelta
 import time
 
+def clean_datetime_str(val):
+    return val.replace(" ","_")
+
 def shift_by_date(date_now, n_days):
     """
     date_now is datetime object
+
+    return
+    -----
+    datetime object
     """
     # now = convert_timestamp_to_date(timestamp)
     delta = timedelta(n_days)
 
-    return (date_now - delta).date()
+    # return (date_now - delta).date()
+    return (date_now - delta)
 
 def convert_timestamp_to_date(timestamp):
     """
