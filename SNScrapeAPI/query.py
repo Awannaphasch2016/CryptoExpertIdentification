@@ -206,7 +206,8 @@ def get_normlize_score(file_path):
 
 
 def get_base_path():
-    return Path('/home/awannaphasch2016/Documents/Working/CryptoExpertIdentification/')
+    return Path.cwd().parent
+    # return Path('/home/awannaphasch2016/Documents/Working/CryptoExpertIdentification/')
 
 class GetTweets:
     def __init__(self):
@@ -565,7 +566,7 @@ if __name__ == "__main__":
     logger_name = "first_logger"
     log_time = str(time.time())
     # base_path = '/home/awannaphasch2016/Documents/Working/CryptoExpertIdentification/SNScrapeAPI/'
-    base_path = str(Path.cwd())
+    base_path = str(get_base_path() / 'SNScrapeAPI')
     # log_relative_path = 'log/'
     log_relative_path = str(Path(base_path) / 'log/')
     log_file_name = str(Path(log_relative_path) / '{}.log'.format(log_time))
