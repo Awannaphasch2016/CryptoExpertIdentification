@@ -1,1 +1,50 @@
 #+TITLE: Readme
+
+
+* Current Experts
+** Traders Accounts
+@BITCOINTRAPPER
+@j0hnnyw00
+
+** Public Figures
+*** Vitalik Burterin            (@VitalikButerin)
+*** Vlad Zamfir                 (@VladZamfir)
+*** Andreas M antonopoulos      (@aantonop)
+*** Joseph lubing               (@ethereumJoseph)
+*** Gavin Wood                  (@gavofyork)
+*** Naval Ravikant              (@naval)
+*** Tayloe Monahan              (@tayvano_)
+*** Nick Szabo                  (@NickSzabo4)
+*** Simon De La Rouviere        (@simondlr)
+*** Chris Burniske              (@cburniske)
+*** Amber Baldet                (@AmberBaldet)
+*** Martin Koppelmann           (@koeppelmann)
+*** John Wolpert                (@jwolpert)
+*** Preethi Kasireddy           (@iam_preethi)
+*** Lane Rettig                 (@lrettig)
+*** Andrew keys                 (@AndrewDARMACAP)
+*** Richard Burton              (@ricburton)
+*** Emin Gun Sirer              (@el33th4xor)
+*** Yan Zhukov                  (@YanNeadekvat)
+*** Evan Van Ness               (@evan_van_ness)
+*** Mike McDonald               (@MikeMcDonald89)
+*** Fred Ersham                 (@FEhrsam)
+*** Laura Shin                  (@laurashin)
+*** =Account is deleted= Ari David Paul              (@AriDevidPaul)
+*** Alex van de Sande           (@avsa)
+*** Josh Stark                  (@)
+*** John Lilic                  (@)
+*** Jackson Palmer              (@)
+*** Jeremy Gardner              (@)
+*** Eric Meltzer                (@)
+*** Vinay Gupta                 (@)
+*** Anthony Pompliano           (@)
+*** Ryan Selkis aka twobitidiot (@)
+*** Jill Carlson                (@)
+*** Trent McConaghy             (@)
+*** Meltem Demirors             (@)
+*** Jeff Coleman                (@)
+*** Brian Armstrong             (@)
+*** Nathaniel Whittemore        (@)
+*** Sam Casatt                  (@)
+*** Spencer Noon                (@)

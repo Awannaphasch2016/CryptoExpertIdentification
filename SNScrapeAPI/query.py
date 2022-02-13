@@ -13,6 +13,48 @@ import json
 import numpy as np
 import argparse
 import sys
+import logging
+
+
+def setup_logger(formatter, name, log_file, level=logging.INFO):
+    """
+    To setup as many loggers as you want
+
+    :NOTE: I am not sure if refactor setup_logger from train_self_supervised into utils will results in information being logged  and stoed correctly. lets run first and I will inspect the results.
+    """
+
+    Path(log_file).parent.absolute().mkdir(parents=True,exist_ok=True)
+
+    fh = logging.FileHandler(log_file)
+    fh.setFormatter(formatter)
+    # fh.terminator = ""
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.WARN)
+    ch.setFormatter(formatter)
+    # ch.terminator = ""
+
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+
+    return logger
+
+class Logger:
+  def set_logger_params(self, formatter, logger_name, log_time, log_relative_path, log_file_name, log_level):
+    self.formatter =  formatter
+    self.logger_name =  logger_name
+    self.log_file_name = log_file_name
+    self.log_level = log_level
+    self.log_time = log_time
+    self.log_relative_path = log_relative_path
+
+  def set_relative_path(self, relative_path):
+    self.relative_path = relative_path
+
+  def setup_logger(self):
+    self.logger = setup_logger(self.formatter, self.logger_name, self.log_file_name, level=self.log_level)
 
 class ArgsClass:
     def __init__(self, name):
@@ -30,6 +72,9 @@ class ArgsClass:
 
     def original_arguments(self, parser):
         parser.add_argument('--n_days', type=int, help='number of days to be analyze', default=None)
+        parser.add_argument('--list_of_coins_to_be_filtered', nargs="+", help='list of coins to be filtered', default=None)
+        parser.add_argument('--is_collect_data', action='store_true', help='Do you want to collect data?')
+        parser.add_argument('--is_report', action='store_true', help='Do you want to report data?')
         return parser
 
     def prep_args(self, parser):
@@ -109,6 +154,9 @@ def is_contained_number(txt):
     return False
 
 def filter_crypto_symbol_from_tweet(txt):
+    """
+    :TODO: This has to be replaced with NLP.
+    """
     cryptos = []
     for i in txt.split('$')[1:]:
         tmp  = i.strip(' ').split(' ')
@@ -295,10 +343,15 @@ def collect_data(config):
             tweets_dict = get_tweets.get_tweets_from_text(i, date_dt, save_file=save_file)
 
 def get_all_files_in_dir(dir_path):
-    print(f'get files from {dir_path}')
     # p = Path(r'C:\Users\akrio\Desktop\Test').glob('**/*')
     p = Path(dir_path).glob('**/*')
-    files = [x for x in p if x.is_file()]
+    files = []
+    for x in p:
+        if x.is_file():
+            dir_path = str(Path(dir_path) / x)
+            logging.getLogger('first_logger').info(f'get files from {dir_path}')
+            files.append(x)
+    # files = [x for x in p if x.is_file()]
     return files
 
 def get_file_from_suffix(files, suffix, option=None):
@@ -344,10 +397,21 @@ def get_file_from_suffix(files, suffix, option=None):
 
     return files_with_suffix
 
+def is_filter_twitter_with_config_text(texts, is_filter=False):
+    assert isinstance(is_filter, int)
+    if is_filter:
+        assert isinstance(texts, list)
+        assert len(texts) > 0
+    return is_filter
+
+def apply_lower_cases(str_list):
+    return [i.lower() for i in str_list]
+
 def summarize_data(config):
     print('summarizing data....')
     n_days = config['is_report']['n_days']
     experts = config['is_report']['list_of_experts']
+    is_filter_with_text = config['is_report']['is_filter_with_text']
     texts = config['is_report']['list_of_text']
     users = config['is_report']['list_of_experts']
     query_option = config['is_report']['query_option']
@@ -356,6 +420,8 @@ def summarize_data(config):
     today = time.time()
     today_dt = convert_timestamp_to_date(today)
     date_dt = shift_by_date(today_dt, n_days)
+
+    is_filter_with_text = is_filter_twitter_with_config_text(texts, is_filter_with_text)
 
     get_query = GetQuery()
     if query_option == 1:
@@ -378,7 +444,12 @@ def summarize_data(config):
                     df = pd.read_csv(str(dir_path / f))
                     summary = Summary()
                     for content, sentiment in zip(df['Text'], df['Sentiment Score']):
-                        cryptos = filter_crypto_symbol_from_tweet(content)
+                        if is_filter_with_text:
+                            cryptos = texts
+                        else:
+                            cryptos = filter_crypto_symbol_from_tweet(content)
+                        if len(cryptos) > 0:
+                            cryptos = apply_lower_cases(cryptos)
                         for c in cryptos:
                             cryptos_sentiment_dict.setdefault(c, []).append(sentiment)
 
@@ -398,6 +469,7 @@ def summarize_data(config):
                 #     print(f'(user-crypto)={user}-{c} => {sum(s)/len(s)}')
 
         else:
+            raise NotImplementedError('forget what this do.')
             for user in users:
                 get_query.set_variables(user=user, date=date_dt.date())
                 query = get_query.get_query(option=query_option)
@@ -442,30 +514,65 @@ def summarize_data(config):
     # result = summary.summarize(pd.DataFrame.to_dict(tweets_dict), option_to_report="sentiment")
     # print(result)
 
+def convert_list_to_str(list_):
+    return " ".join(list_)
+
+def overwrite_config_with_args(config, args):
+    ### overwrite config with args is provided
+    if args.n_days is not None:
+        print(f'overwriting config default of n_days to be {args.n_days}')
+        config['is_collect_data']['n_days'] = args.n_days
+        config['is_report']['n_days'] = args.n_days
+    if args.list_of_coins_to_be_filtered is not None:
+        print(f'overwriting config default of list_of_text to be {convert_list_to_str(args.list_of_coins_to_be_filtered)}')
+        config['is_collect_data']['n_days'] = args.n_days
+        config['is_report']['n_days'] = args.n_days
+    if args.is_collect_data:
+        config['is_collect_data']['is_flag_active'] = True
+    else:
+        config['is_collect_data']['is_flag_active'] = False
+    if args.is_report:
+        config['is_report']['is_flag_active'] = True
+    else:
+        config['is_report']['is_flag_active'] = False
+    return config
+
 def main(args):
     # experts = ['BITCOINTRAPPER', 'j0hnnyw00'] # screen name
     config = get_config()
+    config = overwrite_config_with_args(config, args)
+
     is_collect_data_flag_active = bool(config['is_collect_data']['is_flag_active'])
     is_report_flag_active = bool(config['is_report']['is_flag_active'])
-
-    ### overwrite config with args is provided
-    if args.n_days is not None:
-        print(f'overwriting config default with n_days = {args.n_days}')
-        config['is_collect_data']['n_days'] = args.n_days
-        config['is_report']['n_days'] = args.n_days
 
     if is_collect_data_flag_active:
         collect_data(config)
     else:
-        print('skip collecting data...')
+        logging.getLogger('first_logger').info('skip collecting data...')
+        # print('skip collecting data...')
     if is_report_flag_active:
         summarize_data(config)
     else:
-        print('skip report data...')
+        logging.getLogger('first_logger').info('skip report data...')
     print('done')
 
 
 if __name__ == "__main__":
     args_class = ArgsClass("Args")
     args = args_class.set_args()
+
+    l_1  = Logger()
+    logger_name = "first_logger"
+    log_time = str(time.time())
+    base_path = '/home/awannaphasch2016/Documents/Working/CryptoExpertIdentification/SNScrapeAPI/'
+    # log_relative_path = 'log/'
+    log_relative_path = str(Path(base_path) / 'log/')
+    log_file_name = str(Path(log_relative_path) / '{}.log'.format(log_time))
+    log_level = logging.INFO
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    l_1.set_logger_params(formatter, logger_name, log_time, log_relative_path, log_file_name, log_level)
+    l_1.setup_logger()
+
+    l_1.logger.info(args)
     main(args)
