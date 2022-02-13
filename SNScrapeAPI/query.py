@@ -564,7 +564,8 @@ if __name__ == "__main__":
     l_1  = Logger()
     logger_name = "first_logger"
     log_time = str(time.time())
-    base_path = '/home/awannaphasch2016/Documents/Working/CryptoExpertIdentification/SNScrapeAPI/'
+    # base_path = '/home/awannaphasch2016/Documents/Working/CryptoExpertIdentification/SNScrapeAPI/'
+    base_path = str(Path.cwd())
     # log_relative_path = 'log/'
     log_relative_path = str(Path(base_path) / 'log/')
     log_file_name = str(Path(log_relative_path) / '{}.log'.format(log_time))
