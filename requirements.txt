@@ -212,7 +212,6 @@ voluptuous==0.12.2
 wcwidth==0.2.5
 webcolors==1.11.1
 wrapt==1.12.1
-xdg-open-wsl==1.0.0
 xdot==1.2
 xmltodict==0.12.0
 yapf==0.31.0
